@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/backend.Dockerfile
+    working_dir: /workspace/backend/urban_atlas_api
+    command: uvicorn main:app --host ${UVICORN_HOST:-0.0.0.0} --port ${UVICORN_PORT:-8000} --reload
+    volumes:
+      - ./backend/urban_atlas_api:/workspace/backend/urban_atlas_api
+    ports:
+      - "${BACKEND_HOST_PORT:-8000}:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/frontend.Dockerfile
+    working_dir: /workspace/frontend/urban-atlas-web
+    command: sh -c "npm install && npm start -- --host 0.0.0.0 --port ${ANGULAR_PORT:-4200}"
+    environment:
+      API_BASE_URL: ${API_BASE_URL:-http://localhost:8000}
+    volumes:
+      - ./frontend/urban-atlas-web:/workspace/frontend/urban-atlas-web
+    ports:
+      - "${FRONTEND_HOST_PORT:-4200}:4200"
+    depends_on:
+      - backend
+
