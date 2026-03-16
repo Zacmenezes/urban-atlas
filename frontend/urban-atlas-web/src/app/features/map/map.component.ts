@@ -1,8 +1,6 @@
 import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CardBodyComponent, CardComponent, CardHeaderComponent } from '@coreui/angular';
-import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
-import { ConstructionLicense, MOCK_LICENSES } from '../../shared/models/construction-license.model';
+import { MOCK_LICENSES } from '../../shared/models/construction-license.model';
 import * as L from 'leaflet';
 
 // Fix for Leaflet default icons
@@ -50,23 +48,28 @@ export class MapComponent implements AfterViewInit {
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   private map: L.Map | null = null;
   private readonly licenses = MOCK_LICENSES;
+  private boundaryLayer: L.GeoJSON | null = null;
+  private outsideMaskLayer: L.Polygon | null = null;
 
   // Fortaleza, Brazil coordinates
   private readonly fortalezaCenter = { lat: -3.7319, lng: -38.5267 };
-  private readonly initialZoom = 13;
+  private readonly initialZoom = 12;
+  private readonly fortalezaGeoJsonUrl = 'assets/geo/fortaleza.geojson';
 
   ngAfterViewInit(): void {
-    this.initializeMap();
+    void this.initializeMap();
   }
 
-  private initializeMap(): void {
+  private async initializeMap(): Promise<void> {
     if (!this.mapContainer) {
       console.warn('Map container not found');
       return;
     }
 
-    // Initialize the map
-    this.map = L.map(this.mapContainer.nativeElement).setView(
+    // Initialize map centered in Fortaleza.
+    this.map = L.map(this.mapContainer.nativeElement, {
+      zoomControl: true
+    }).setView(
       [this.fortalezaCenter.lat, this.fortalezaCenter.lng],
       this.initialZoom
     );
@@ -77,8 +80,87 @@ export class MapComponent implements AfterViewInit {
       maxZoom: 19
     }).addTo(this.map);
 
+    await this.loadFortalezaBoundary();
+
     // Add markers for each license
     this.addMarkers();
+  }
+
+  private async loadFortalezaBoundary(): Promise<void> {
+    if (!this.map) {
+      return;
+    }
+
+    try {
+      const response = await fetch(this.fortalezaGeoJsonUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const geoJson = (await response.json()) as GeoJSON.GeoJsonObject;
+      this.outsideMaskLayer?.remove();
+      this.boundaryLayer?.remove();
+
+      const innerRing = this.extractMainRing(geoJson);
+      if (innerRing.length > 0) {
+        const worldRing: L.LatLngExpression[] = [
+          [90, -180],
+          [90, 180],
+          [-90, 180],
+          [-90, -180]
+        ];
+
+        this.outsideMaskLayer = L.polygon([worldRing, innerRing], {
+          stroke: false,
+          fillColor: '#6B7280',
+          fillOpacity: 0.35,
+          fillRule: 'evenodd',
+          interactive: false
+        }).addTo(this.map);
+      }
+
+      this.boundaryLayer = L.geoJSON(geoJson, {
+        style: {
+          color: '#2A7FFF',
+          weight: 3,
+          fillOpacity: 0,
+          fillColor: '#2A7FFF'
+        }
+      }).addTo(this.map);
+
+      const bounds = this.boundaryLayer.getBounds();
+      if (bounds.isValid()) {
+        this.map.fitBounds(bounds);
+      }
+    } catch (error) {
+      console.error('Failed to load Fortaleza GeoJSON boundary:', error);
+    }
+  }
+
+  private extractMainRing(geoJson: GeoJSON.GeoJsonObject): L.LatLngExpression[] {
+    let feature: GeoJSON.Feature | null = null;
+
+    if (geoJson.type === 'FeatureCollection') {
+      const collection = geoJson as GeoJSON.FeatureCollection;
+      feature = (collection.features[0] as GeoJSON.Feature) ?? null;
+    } else if (geoJson.type === 'Feature') {
+      feature = geoJson as GeoJSON.Feature;
+    }
+
+    if (!feature || !feature.geometry) {
+      return [];
+    }
+
+    const geometry = feature.geometry;
+    let ring: number[][] = [];
+
+    if (geometry.type === 'Polygon') {
+      ring = geometry.coordinates[0] as number[][];
+    } else if (geometry.type === 'MultiPolygon') {
+      ring = geometry.coordinates[0][0] as number[][];
+    }
+
+    return ring.map(([lng, lat]) => [lat, lng] as L.LatLngExpression);
   }
 
   private addMarkers(): void {
