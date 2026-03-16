@@ -1,6 +1,8 @@
-import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MOCK_LICENSES } from '../../shared/models/construction-license.model';
+import { firstValueFrom } from 'rxjs';
+import { LicensesApiService } from '../../core/services/licenses-api.service';
+import { ConstructionLicense } from '../../shared/models/construction-license.model';
 import * as L from 'leaflet';
 
 // Fix for Leaflet default icons
@@ -46,8 +48,9 @@ L.Marker.prototype.options.icon = iconDefault;
 })
 export class MapComponent implements AfterViewInit {
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
+  private readonly licensesApiService = inject(LicensesApiService);
   private map: L.Map | null = null;
-  private readonly licenses = MOCK_LICENSES;
+  private licenses: ConstructionLicense[] = [];
   private boundaryLayer: L.GeoJSON | null = null;
   private outsideMaskLayer: L.Polygon | null = null;
 
@@ -81,9 +84,19 @@ export class MapComponent implements AfterViewInit {
     }).addTo(this.map);
 
     await this.loadFortalezaBoundary();
+    await this.loadLicenses();
 
     // Add markers for each license
     this.addMarkers();
+  }
+
+  private async loadLicenses(): Promise<void> {
+    try {
+      this.licenses = await firstValueFrom(this.licensesApiService.list());
+    } catch (error) {
+      console.error('Failed to load licenses from API:', error);
+      this.licenses = [];
+    }
   }
 
   private async loadFortalezaBoundary(): Promise<void> {
