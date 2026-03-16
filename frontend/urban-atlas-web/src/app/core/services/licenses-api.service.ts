@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { License } from '../../shared/models/license.model';
+import { License } from '../../shared/models';
 
 @Injectable({ providedIn: 'root' })
 export class LicensesApiService {
