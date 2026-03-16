@@ -12,6 +12,7 @@ venv/
 # Node / Angular
 node_modules/
 dist/
+.angular/
 coverage/
 .npm/
 
