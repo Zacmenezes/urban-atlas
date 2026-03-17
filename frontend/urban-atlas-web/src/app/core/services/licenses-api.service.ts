@@ -20,7 +20,7 @@ export class LicensesApiService {
       .set('bbox', params.bbox)
       .set('zoom', String(params.zoom));
 
-    return this.http.get<ConstructionLicenseApiResponse[]>('/licenses', { params: queryParams }).pipe(
+    return this.http.get<ConstructionLicenseApiResponse[]>('/licenses/map', { params: queryParams }).pipe(
       map((rows) =>
         rows
           .filter((row) => row.latitude !== null && row.longitude !== null)

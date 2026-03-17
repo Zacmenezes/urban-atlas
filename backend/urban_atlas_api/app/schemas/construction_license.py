@@ -36,3 +36,10 @@ class ConstructionLicenseMapRead(BaseModel):
     address: str | None = None
 
 
+class ConstructionLicenseListRead(BaseModel):
+    items: list[ConstructionLicenseRead]
+    total: int
+    page: int
+    page_size: int
+
+
