@@ -27,3 +27,12 @@ class ConstructionLicenseRead(ConstructionLicenseBase):
 
     model_config = ConfigDict(from_attributes=True)
 
+
+class ConstructionLicenseMapRead(BaseModel):
+    id: int
+    latitude: float
+    longitude: float
+    process_number: str | None = None
+    address: str | None = None
+
+

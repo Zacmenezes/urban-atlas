@@ -1,9 +1,11 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, inject } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { firstValueFrom } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, of, Subject, switchMap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LicensesApiService } from '../../core/services/licenses-api.service';
 import { ConstructionLicense } from '../../shared/models/construction-license.model';
 import * as L from 'leaflet';
+import 'leaflet.markercluster';
 
 // Fix for Leaflet default icons
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
@@ -49,10 +51,13 @@ L.Marker.prototype.options.icon = iconDefault;
 export class MapComponent implements AfterViewInit {
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
   private readonly licensesApiService = inject(LicensesApiService);
+  private readonly destroyRef = inject(DestroyRef);
   private map: L.Map | null = null;
   private licenses: ConstructionLicense[] = [];
   private boundaryLayer: L.GeoJSON | null = null;
   private outsideMaskLayer: L.Polygon | null = null;
+  private markerClusterGroup: L.MarkerClusterGroup | null = null;
+  private readonly viewportChanges = new Subject<{ bbox: string; zoom: number }>();
 
   // Fortaleza, Brazil coordinates
   private readonly fortalezaCenter = { lat: -3.7319, lng: -38.5267 };
@@ -83,20 +88,74 @@ export class MapComponent implements AfterViewInit {
       maxZoom: 19
     }).addTo(this.map);
 
+    this.initializeMarkerClusters();
+    this.initializeViewportLoading();
     await this.loadFortalezaBoundary();
-    await this.loadLicenses();
-
-    // Add markers for each license
-    this.addMarkers();
+    this.registerMapEvents();
+    this.queueViewportLoad();
   }
 
-  private async loadLicenses(): Promise<void> {
-    try {
-      this.licenses = await firstValueFrom(this.licensesApiService.list());
-    } catch (error) {
-      console.error('Failed to load licenses from API:', error);
-      this.licenses = [];
+  private initializeMarkerClusters(): void {
+    if (!this.map) {
+      return;
     }
+
+    this.markerClusterGroup = L.markerClusterGroup({
+      showCoverageOnHover: false
+    });
+    this.markerClusterGroup.addTo(this.map);
+  }
+
+  private initializeViewportLoading(): void {
+    this.viewportChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged((previous, current) => previous.bbox === current.bbox && previous.zoom === current.zoom),
+        switchMap(({ bbox, zoom }) =>
+          this.licensesApiService.list({ bbox, zoom }).pipe(
+            map((licenses) => ({ licenses, zoom })),
+            catchError((error) => {
+              console.error('Failed to load licenses from API:', error);
+              return of({ licenses: [] as ConstructionLicense[], zoom });
+            })
+          )
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: ({ licenses, zoom }) => {
+          this.licenses = licenses;
+          this.renderMarkers(zoom);
+        }
+      });
+  }
+
+  private registerMapEvents(): void {
+    if (!this.map) {
+      return;
+    }
+
+    this.map.on('moveend', () => this.queueViewportLoad());
+    this.map.on('zoomend', () => this.queueViewportLoad());
+  }
+
+  private queueViewportLoad(): void {
+    if (!this.map) {
+      return;
+    }
+
+    const bounds = this.map.getBounds();
+    const bbox = [
+      bounds.getWest(),
+      bounds.getSouth(),
+      bounds.getEast(),
+      bounds.getNorth()
+    ].join(',');
+
+    this.viewportChanges.next({
+      bbox,
+      zoom: this.map.getZoom()
+    });
   }
 
   private async loadFortalezaBoundary(): Promise<void> {
@@ -176,8 +235,16 @@ export class MapComponent implements AfterViewInit {
     return ring.map(([lng, lat]) => [lat, lng] as L.LatLngExpression);
   }
 
-  private addMarkers(): void {
-    if (!this.map) return;
+  private renderMarkers(zoom: number): void {
+    if (!this.markerClusterGroup) {
+      return;
+    }
+
+    this.markerClusterGroup.clearLayers();
+
+    if (zoom < 12) {
+      return;
+    }
 
     this.licenses.forEach((license) => {
       const marker = L.marker([license.latitude, license.longitude], {
@@ -193,7 +260,7 @@ export class MapComponent implements AfterViewInit {
         </div>
       `);
 
-      marker.addTo(this.map!);
+      this.markerClusterGroup?.addLayer(marker);
     });
   }
 }
