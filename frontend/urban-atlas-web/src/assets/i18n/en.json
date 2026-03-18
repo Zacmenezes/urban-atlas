@@ -1,0 +1,61 @@
+{
+  "MENU": {
+    "DASHBOARD": "Dashboard",
+    "MAP": "Map",
+    "LICENSES": "Licenses"
+  },
+  "DASHBOARD": {
+    "TITLE": "UrbanAtlas Dashboard",
+    "SUBTITLE": "Track construction licensing activity and quickly jump to the map and license registry.",
+    "ACTIVE_LICENSES": "Active licenses",
+    "MAP_MARKERS": "Map markers",
+    "VIEW_LICENSE_LIST": "View license list",
+    "OPEN_MAP_VIEW": "Open map view"
+  },
+  "LICENSES": {
+    "TITLE": "Licenses",
+    "SUBTITLE": "Construction licenses prepared for list management, filters, and API-driven pagination.",
+    "PROCESS_NUMBER": "License (Process)",
+    "LICENSE_NUMBER": "License Number",
+    "ADDRESS": "Address",
+    "BUILDER": "Builder",
+    "AREA": "Area (m²)",
+    "ISSUE_DATE": "Issue Date",
+    "EXPIRATION_DATE": "Expiration Date",
+    "STATUS": "Status",
+    "RECENT_RECORDS": "Recent license records",
+    "SEARCH": {
+      "PROCESS_NUMBER": "Search process number",
+      "LICENSE_NUMBER": "Search license number",
+      "BUILDER": "Search builder",
+      "ISSUE_DATE_FROM": "Issue Date From",
+      "ISSUE_DATE_TO": "Issue Date To",
+      "STATUS": "Status",
+      "PAGE_SIZE": "Page Size",
+      "SEARCH_BTN": "Search"
+    },
+    "FILTER": {
+      "ALL": "All",
+      "ACTIVE": "Active",
+      "EXPIRED": "Expired",
+      "UNKNOWN": "Unknown"
+    },
+    "TABLE": {
+      "SHOWING": "Showing",
+      "OF": "of",
+      "LICENSES": "licenses",
+      "PREVIOUS": "Previous",
+      "NEXT": "Next",
+      "PAGE": "Page",
+      "PAGE_OF": "of",
+      "LOADING": "Loading licenses...",
+      "NO_RESULTS": "No licenses found."
+    }
+  },
+  "LANGUAGE": {
+    "LABEL": "Language",
+    "EN": "English",
+    "PT_BR": "Português"
+  }
+}
+

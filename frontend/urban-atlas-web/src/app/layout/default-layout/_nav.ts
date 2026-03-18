@@ -2,17 +2,17 @@ import { INavData } from '@coreui/angular';
 
 export const navItems: INavData[] = [
   {
-    name: 'Dashboard',
+    name: 'MENU.DASHBOARD',
     url: '/dashboard',
     iconComponent: { name: 'cil-speedometer' }
   },
   {
-    name: 'Map',
+    name: 'MENU.MAP',
     url: '/map',
     iconComponent: { name: 'cil-map' }
   },
   {
-    name: 'Licenses',
+    name: 'MENU.LICENSES',
     url: '/licenses',
     iconComponent: { name: 'cil-description' }
   }

@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
 
 import { IconDirective } from '@coreui/icons-angular';
 import {
   ContainerComponent,
+  INavData,
   ShadowOnScrollDirective,
   SidebarBrandComponent,
   SidebarComponent,
@@ -14,16 +15,10 @@ import {
   SidebarToggleDirective,
   SidebarTogglerDirective
 } from '@coreui/angular';
+import { TranslateService } from '@ngx-translate/core';
 
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
 import { navItems } from './_nav';
-
-function isOverflown(element: HTMLElement) {
-  return (
-    element.scrollHeight > element.clientHeight ||
-    element.scrollWidth > element.clientWidth
-  );
-}
 
 @Component({
   selector: 'app-dashboard',
@@ -47,6 +42,20 @@ function isOverflown(element: HTMLElement) {
     ShadowOnScrollDirective
   ]
 })
-export class DefaultLayoutComponent {
-  public navItems = [...navItems];
+export class DefaultLayoutComponent implements OnInit {
+  public navItems: INavData[] = [];
+
+  constructor(private readonly translate: TranslateService) {}
+
+  ngOnInit(): void {
+    this.rebuildNavItems();
+    this.translate.onLangChange.subscribe(() => this.rebuildNavItems());
+  }
+
+  private rebuildNavItems(): void {
+    this.navItems = navItems.map(item => ({
+      ...item,
+      name: item.name ? this.translate.instant(item.name) : item.name
+    }));
+  }
 }

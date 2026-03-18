@@ -1,0 +1,61 @@
+{
+  "MENU": {
+    "DASHBOARD": "Painel",
+    "MAP": "Mapa",
+    "LICENSES": "Alvarás"
+  },
+  "DASHBOARD": {
+    "TITLE": "Painel",
+    "SUBTITLE": "Acompanhe a atividade de licenciamento de construções e acesse rapidamente o mapa e o registro de alvarás.",
+    "ACTIVE_LICENSES": "Alvarás ativos",
+    "MAP_MARKERS": "Marcadores no mapa",
+    "VIEW_LICENSE_LIST": "Ver lista de alvarás",
+    "OPEN_MAP_VIEW": "Abrir visualização do mapa"
+  },
+  "LICENSES": {
+    "TITLE": "Alvarás",
+    "SUBTITLE": "Alvarás de construção. ",
+    "PROCESS_NUMBER": "N° do Processo",
+    "LICENSE_NUMBER": "N° do Alvará",
+    "ADDRESS": "Endereço",
+    "BUILDER": "Construtor",
+    "AREA": "Área (m²)",
+    "ISSUE_DATE": "Data de Emissão",
+    "EXPIRATION_DATE": "Data de Vencimento",
+    "STATUS": "Status",
+    "RECENT_RECORDS": "Registros recentes de alvarás",
+    "SEARCH": {
+      "PROCESS_NUMBER": "Buscar n° do processo",
+      "LICENSE_NUMBER": "Buscar n° do alvará",
+      "BUILDER": "Buscar construtor",
+      "ISSUE_DATE_FROM": "Data de Emissão (De)",
+      "ISSUE_DATE_TO": "Data de Emissão (Até)",
+      "STATUS": "Status",
+      "PAGE_SIZE": "Itens por Página",
+      "SEARCH_BTN": "Buscar"
+    },
+    "FILTER": {
+      "ALL": "Todos",
+      "ACTIVE": "Ativo",
+      "EXPIRED": "Expirado",
+      "UNKNOWN": "Desconhecido"
+    },
+    "TABLE": {
+      "SHOWING": "Exibindo",
+      "OF": "de",
+      "LICENSES": "alvarás",
+      "PREVIOUS": "Anterior",
+      "NEXT": "Próximo",
+      "PAGE": "Página",
+      "PAGE_OF": "de",
+      "LOADING": "Carregando alvarás...",
+      "NO_RESULTS": "Nenhum alvará encontrado."
+    }
+  },
+  "LANGUAGE": {
+    "LABEL": "Idioma",
+    "EN": "English",
+    "PT_BR": "Português"
+  }
+}
+

@@ -1,51 +1,46 @@
-<!--<c-header class="mb-4 d-print-none" position="sticky">-->
 <ng-container>
   <c-container [fluid]="true" class="border-bottom px-4">
-    <button
-      [cSidebarToggle]="sidebarId()"
-      cHeaderToggler
-      class="btn"
-      toggle="visible"
-      style="margin-inline-start: -14px;"
-      aria-label="Toggle sidebar navigation"
-    >
-      <svg cIcon name="cilMenu" size="lg"></svg>
-    </button>
-    <c-header-nav class="d-none d-md-flex">
-      <c-nav-item>
-        <a cNavLink routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-      </c-nav-item>
-      <c-nav-item>
-        <a cNavLink routerLink="/map" routerLinkActive="active">Map</a>
-      </c-nav-item>
-      <c-nav-item>
-        <a cNavLink routerLink="/licenses" routerLinkActive="active">Licenses</a>
-      </c-nav-item>
-    </c-header-nav>
+    <div class="d-flex align-items-center w-100">
+      <div class="d-flex align-items-center gap-3">
+        <button
+          [cSidebarToggle]="sidebarId()"
+          cHeaderToggler
+          class="btn"
+          toggle="visible"
+          style="margin-inline-start: -14px;"
+          aria-label="Toggle sidebar navigation"
+        >
+          <svg cIcon name="cilMenu" size="lg"></svg>
+        </button>
 
-    <c-header-nav class="ms-auto ms-md-0">
-      <div class="nav-item py-1">
-        <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
+        <c-header-nav class="d-none d-md-flex align-items-center gap-1">
+          <c-nav-item>
+            <a cNavLink class="px-2" routerLink="/dashboard" routerLinkActive="active">{{ 'MENU.DASHBOARD' | translate }}</a>
+          </c-nav-item>
+          <c-nav-item>
+            <a cNavLink class="px-2" routerLink="/map" routerLinkActive="active">{{ 'MENU.MAP' | translate }}</a>
+          </c-nav-item>
+          <c-nav-item>
+            <a cNavLink class="px-2" routerLink="/licenses" routerLinkActive="active">{{ 'MENU.LICENSES' | translate }}</a>
+          </c-nav-item>
+        </c-header-nav>
       </div>
-      <ng-container *ngTemplateOutlet="themeDropdown" />
-      <div class="nav-item py-1">
-        <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
-      </div>
-    </c-header-nav>
 
-    <c-header-nav class="mx-0">
-      <ng-container *ngTemplateOutlet="userDropdown" />
-    </c-header-nav>
-
+      <c-header-nav class="ms-auto d-flex align-items-center gap-2 gap-md-3">
+        <ng-container *ngTemplateOutlet="languageDropdown" />
+        <ng-container *ngTemplateOutlet="themeDropdown" />
+        <ng-container *ngTemplateOutlet="userDropdown" />
+      </c-header-nav>
+    </div>
   </c-container>
+
   <c-container [fluid]="true" class="px-4">
     <c-breadcrumb-router />
   </c-container>
 </ng-container>
-<!--</c-header>-->
 
 <ng-template #userDropdown>
-  <c-dropdown [popperOptions]="{ placement: 'bottom-start' }" variant="nav-item">
+  <c-dropdown [popperOptions]="{ placement: 'bottom-end' }" variant="nav-item">
     <button [caret]="false" cDropdownToggle class="py-0 pe-0" aria-label="Open user menu">
       <c-avatar
         shape="rounded-1"
@@ -147,9 +142,30 @@
   </c-dropdown>
 </ng-template>
 
+<ng-template #languageDropdown>
+  <c-dropdown alignment="end" variant="nav-item">
+    <button [caret]="false" cDropdownToggle aria-label="Switch language" class="d-flex align-items-center px-2">
+      <span class="d-none d-sm-inline">{{ languageService.getCurrentLanguage() === 'pt-BR' ? 'Português' : 'English' }}</span>
+      <span class="d-sm-none">{{ languageService.getCurrentLanguage() === 'pt-BR' ? 'PT' : 'EN' }}</span>
+    </button>
+    <div cDropdownMenu>
+      @for (lang of languageService.languages; track lang.code) {
+        <button
+          (click)="languageService.setLanguage(lang.code)"
+          [active]="languageService.getCurrentLanguage() === lang.code"
+          cDropdownItem
+          class="d-flex align-items-center"
+        >
+          {{ lang.code === 'pt-BR' ? 'Português' : 'English' }}
+        </button>
+      }
+    </div>
+  </c-dropdown>
+</ng-template>
+
 <ng-template #themeDropdown>
   <c-dropdown alignment="end" variant="nav-item">
-    <button [caret]="false" cDropdownToggle aria-label="Open theme picker">
+    <button [caret]="false" cDropdownToggle aria-label="Open theme picker" class="d-flex align-items-center px-2">
       <svg cIcon [name]="icons()" size="lg"></svg>
     </button>
     <div cDropdownMenu>
