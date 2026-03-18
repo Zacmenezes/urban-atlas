@@ -61,7 +61,7 @@ export class MapComponent implements AfterViewInit {
 
   // Fortaleza, Brazil coordinates
   private readonly fortalezaCenter = { lat: -3.7319, lng: -38.5267 };
-  private readonly initialZoom = 12;
+  private readonly initialZoom = 13;
   private readonly fortalezaGeoJsonUrl = 'assets/geo/fortaleza.geojson';
 
   ngAfterViewInit(): void {
@@ -194,7 +194,8 @@ export class MapComponent implements AfterViewInit {
       this.boundaryLayer = L.geoJSON(geoJson, {
         style: {
           color: '#2A7FFF',
-          weight: 3,
+          weight: 1,
+          dashArray: '6 4',
           fillOpacity: 0,
           fillColor: '#2A7FFF'
         }
