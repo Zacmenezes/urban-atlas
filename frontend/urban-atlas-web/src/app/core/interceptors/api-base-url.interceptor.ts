@@ -3,7 +3,7 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { API_BASE_URL } from '../api/api.config';
 
 export const apiBaseUrlInterceptor: HttpInterceptorFn = (req, next) => {
-  if (/^https?:\/\//i.test(req.url)) {
+  if (/^https?:\/\//i.test(req.url) || req.url.startsWith('/assets/')) {
     return next(req);
   }
 

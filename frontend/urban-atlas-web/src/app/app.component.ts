@@ -7,6 +7,7 @@ import { delay, filter, map, tap } from 'rxjs/operators';
 import { ColorModeService } from '@coreui/angular';
 import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
+import { LanguageService } from './core/services/language.service';
 
 @Component({
     selector: 'app-root',
@@ -23,6 +24,7 @@ export class AppComponent implements OnInit {
 
   readonly #colorModeService = inject(ColorModeService);
   readonly #iconSetService = inject(IconSetService);
+  readonly #languageService = inject(LanguageService);
 
   constructor() {
     this.#titleService.setTitle(this.title);
@@ -30,6 +32,7 @@ export class AppComponent implements OnInit {
     this.#iconSetService.icons = { ...iconSubset };
     this.#colorModeService.localStorageItemName.set('urban-atlas-theme-default');
     this.#colorModeService.eventName.set('ColorSchemeChange');
+    this.#languageService.init();
   }
 
   ngOnInit(): void {

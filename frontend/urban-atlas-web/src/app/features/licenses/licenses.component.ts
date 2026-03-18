@@ -3,6 +3,7 @@ import { AsyncPipe, NgFor } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CardBodyComponent, CardComponent, CardHeaderComponent, TableDirective } from '@coreui/angular';
 import { catchError, debounceTime, distinctUntilChanged, map, merge, Observable, of, scan, shareReplay, startWith, Subject, switchMap } from 'rxjs';
+import { TranslatePipe } from '@ngx-translate/core';
 import { LicenseListResult, LicenseService, LicenseStatusFilter } from '../../core/services/license.service';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 import { License } from '../../shared/models/license.model';
@@ -10,47 +11,47 @@ import { License } from '../../shared/models/license.model';
 @Component({
   template: `
     <app-page-title
-      title="Licenses"
-      subtitle="Construction licenses prepared for list management, filters, and API-driven pagination."
+      [title]="'LICENSES.TITLE' | translate"
+      [subtitle]="'LICENSES.SUBTITLE' | translate"
     />
 
     <c-card>
-      <c-card-header>Recent license records</c-card-header>
+      <c-card-header>{{ 'LICENSES.RECENT_RECORDS' | translate }}</c-card-header>
       <c-card-body>
         @if (vm$ | async; as vm) {
         <form class="row g-3 mb-3" [formGroup]="filtersForm">
           <div class="col-12 col-md-4">
-            <label for="processNumber" class="form-label">License (Process)</label>
+            <label for="processNumber" class="form-label">{{ 'LICENSES.PROCESS_NUMBER' | translate }}</label>
             <input
               id="processNumber"
               type="text"
               class="form-control"
               formControlName="processNumber"
-              placeholder="Search process number"
+              [placeholder]="'LICENSES.SEARCH.PROCESS_NUMBER' | translate"
             />
           </div>
           <div class="col-12 col-md-4">
-            <label for="licenseNumber" class="form-label">License Number</label>
+            <label for="licenseNumber" class="form-label">{{ 'LICENSES.LICENSE_NUMBER' | translate }}</label>
             <input
               id="licenseNumber"
               type="text"
               class="form-control"
               formControlName="licenseNumber"
-              placeholder="Search license number"
+              [placeholder]="'LICENSES.SEARCH.LICENSE_NUMBER' | translate"
             />
           </div>
           <div class="col-12 col-md-4">
-            <label for="builder" class="form-label">Builder</label>
+            <label for="builder" class="form-label">{{ 'LICENSES.BUILDER' | translate }}</label>
             <input
               id="builder"
               type="text"
               class="form-control"
               formControlName="builder"
-              placeholder="Search builder"
+              [placeholder]="'LICENSES.SEARCH.BUILDER' | translate"
             />
           </div>
           <div class="col-12 col-md-3">
-            <label for="startDate" class="form-label">Issue Date From</label>
+            <label for="startDate" class="form-label">{{ 'LICENSES.SEARCH.ISSUE_DATE_FROM' | translate }}</label>
             <input
               id="startDate"
               type="date"
@@ -59,7 +60,7 @@ import { License } from '../../shared/models/license.model';
             />
           </div>
           <div class="col-12 col-md-3">
-            <label for="endDate" class="form-label">Issue Date To</label>
+            <label for="endDate" class="form-label">{{ 'LICENSES.SEARCH.ISSUE_DATE_TO' | translate }}</label>
             <input
               id="endDate"
               type="date"
@@ -68,16 +69,16 @@ import { License } from '../../shared/models/license.model';
             />
           </div>
           <div class="col-12 col-md-3">
-            <label for="status" class="form-label">Status</label>
+            <label for="status" class="form-label">{{ 'LICENSES.STATUS' | translate }}</label>
             <select id="status" class="form-select" formControlName="status">
-              <option value="all">All</option>
-              <option value="active">Active</option>
-              <option value="expired">Expired</option>
-              <option value="unknown">Unknown</option>
+              <option value="all">{{ 'LICENSES.FILTER.ALL' | translate }}</option>
+              <option value="active">{{ 'LICENSES.FILTER.ACTIVE' | translate }}</option>
+              <option value="expired">{{ 'LICENSES.FILTER.EXPIRED' | translate }}</option>
+              <option value="unknown">{{ 'LICENSES.FILTER.UNKNOWN' | translate }}</option>
             </select>
           </div>
           <div class="col-12 col-md-3">
-            <label for="pageSize" class="form-label">Page Size</label>
+            <label for="pageSize" class="form-label">{{ 'LICENSES.SEARCH.PAGE_SIZE' | translate }}</label>
             <select id="pageSize" class="form-select" [value]="vm.pageSize" (change)="onPageSizeChange($any($event.target).value)">
               <option value="10">10</option>
               <option value="20">20</option>
@@ -85,26 +86,26 @@ import { License } from '../../shared/models/license.model';
             </select>
           </div>
           <div class="col-12 d-flex justify-content-end">
-            <button type="button" class="btn btn-primary" [disabled]="vm.isLoading" (click)="applySearch()">Search</button>
+            <button type="button" class="btn btn-primary" [disabled]="vm.isLoading" (click)="applySearch()">{{ 'LICENSES.SEARCH.SEARCH_BTN' | translate }}</button>
           </div>
         </form>
 
         <div class="d-flex justify-content-between align-items-center mb-3">
           <span class="text-body-secondary">
-            Showing {{ vm.licenses.length }} of {{ vm.totalDisplay }} licenses
+            {{ 'LICENSES.TABLE.SHOWING' | translate }} {{ vm.licenses.length }} {{ 'LICENSES.TABLE.OF' | translate }} {{ vm.totalDisplay }} {{ 'LICENSES.TABLE.LICENSES' | translate }}
           </span>
           <div class="d-flex align-items-center gap-2">
             <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="vm.isLoading || vm.page <= 1" (click)="goToPreviousPage(vm.page)">
-              Previous
+              {{ 'LICENSES.TABLE.PREVIOUS' | translate }}
             </button>
-            <span class="small">Page {{ vm.page }} of {{ vm.totalPages }}</span>
+            <span class="small">{{ 'LICENSES.TABLE.PAGE' | translate }} {{ vm.page }} {{ 'LICENSES.TABLE.PAGE_OF' | translate }} {{ vm.totalPages }}</span>
             <button
               type="button"
               class="btn btn-outline-secondary btn-sm"
               [disabled]="vm.isLoading || vm.page >= vm.totalPages"
               (click)="goToNextPage(vm.page, vm.totalPages)"
             >
-              Next
+              {{ 'LICENSES.TABLE.NEXT' | translate }}
             </button>
           </div>
         </div>
@@ -112,24 +113,24 @@ import { License } from '../../shared/models/license.model';
         <table cTable [hover]="true" [striped]="true">
           <thead>
           <tr>
-            <th scope="col">License (Process)</th>
-            <th scope="col">License Number</th>
-            <th scope="col">Address</th>
-            <th scope="col">Builder</th>
-            <th scope="col">Area (m²)</th>
-            <th scope="col">Issue Date</th>
-            <th scope="col">Expiration Date</th>
-            <th scope="col">Status</th>
+            <th scope="col">{{ 'LICENSES.PROCESS_NUMBER' | translate }}</th>
+            <th scope="col">{{ 'LICENSES.LICENSE_NUMBER' | translate }}</th>
+            <th scope="col">{{ 'LICENSES.ADDRESS' | translate }}</th>
+            <th scope="col">{{ 'LICENSES.BUILDER' | translate }}</th>
+            <th scope="col">{{ 'LICENSES.AREA' | translate }}</th>
+            <th scope="col">{{ 'LICENSES.ISSUE_DATE' | translate }}</th>
+            <th scope="col">{{ 'LICENSES.EXPIRATION_DATE' | translate }}</th>
+            <th scope="col">{{ 'LICENSES.STATUS' | translate }}</th>
           </tr>
           </thead>
           <tbody>
             @if (vm.isLoading) {
               <tr>
-                <td colspan="8" class="text-center py-4">Loading licenses...</td>
+                <td colspan="8" class="text-center py-4">{{ 'LICENSES.TABLE.LOADING' | translate }}</td>
               </tr>
             } @else if (vm.licenses.length === 0) {
               <tr>
-                <td colspan="8" class="text-center py-4">No licenses found.</td>
+                <td colspan="8" class="text-center py-4">{{ 'LICENSES.TABLE.NO_RESULTS' | translate }}</td>
               </tr>
             } @else {
               <tr *ngFor="let license of licenses$ | async; trackBy: trackById">
@@ -151,7 +152,7 @@ import { License } from '../../shared/models/license.model';
       </c-card-body>
     </c-card>
   `,
-  imports: [PageTitleComponent, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective, ReactiveFormsModule, NgFor, AsyncPipe],
+  imports: [PageTitleComponent, CardComponent, CardHeaderComponent, CardBodyComponent, TableDirective, ReactiveFormsModule, NgFor, AsyncPipe, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LicensesComponent {

@@ -3,40 +3,41 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CardBodyComponent, CardComponent, CardHeaderComponent, ColComponent, RowComponent } from '@coreui/angular';
 import { catchError, forkJoin, map, Observable, of, shareReplay, startWith } from 'rxjs';
+import { TranslatePipe } from '@ngx-translate/core';
 import { LicenseService, LicenseStatusFilter } from '../../core/services/license.service';
 import { PageTitleComponent } from '../../shared/components/page-title/page-title.component';
 
 @Component({
   template: `
     <app-page-title
-      title="UrbanAtlas Dashboard"
-      subtitle="Track construction licensing activity and quickly jump to the map and license registry."
+      [title]="'DASHBOARD.TITLE' | translate"
+      [subtitle]="'DASHBOARD.SUBTITLE' | translate"
     />
 
     @if (vm$ | async; as vm) {
     <c-row class="g-4">
       <c-col md="6">
         <c-card>
-          <c-card-header>Active licenses</c-card-header>
+          <c-card-header>{{ 'DASHBOARD.ACTIVE_LICENSES' | translate }}</c-card-header>
           <c-card-body>
             <p class="display-6 mb-2">{{ vm.activeLicensesDisplay }}</p>
-            <a [routerLink]="['/licenses']">View license list</a>
+            <a [routerLink]="['/licenses']">{{ 'DASHBOARD.VIEW_LICENSE_LIST' | translate }}</a>
           </c-card-body>
         </c-card>
       </c-col>
       <c-col md="6">
         <c-card>
-          <c-card-header>Map markers</c-card-header>
+          <c-card-header>{{ 'DASHBOARD.MAP_MARKERS' | translate }}</c-card-header>
           <c-card-body>
             <p class="display-6 mb-2">{{ vm.totalLicensesDisplay }}</p>
-            <a [routerLink]="['/map']">Open map view</a>
+            <a [routerLink]="['/map']">{{ 'DASHBOARD.OPEN_MAP_VIEW' | translate }}</a>
           </c-card-body>
         </c-card>
       </c-col>
     </c-row>
     }
   `,
-  imports: [AsyncPipe, PageTitleComponent, RowComponent, ColComponent, CardComponent, CardHeaderComponent, CardBodyComponent, RouterLink],
+  imports: [AsyncPipe, PageTitleComponent, RowComponent, ColComponent, CardComponent, CardHeaderComponent, CardBodyComponent, RouterLink, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent {
